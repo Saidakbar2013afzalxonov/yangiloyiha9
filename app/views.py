@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .serializers import RegisterSerializer
-from rest_framework import generics
+from .serializers import RegisterSerializer, LoginSerializer, RefreshSerializer
+from rest_framework import generics, status
 
 
 class RegisterAPIView(generics.CreateAPIView):
@@ -46,3 +46,16 @@ class LogoutView(generics.GenericAPIView):
                 {"error": "Invalid refresh token."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+class LoginAPIView(APIView):
+    def post(self, request):
+        serializer = LoginSerializer(data = request.data)
+        serializer.is_valid(raise_exception = True)
+        return Response(serializer.validated_data, status = status.HTTP_200_OK)
+
+
+class RefreshAPIView(APIView):
+    def post(self, request):
+        serializer = RefreshSerializer(data = request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data)
